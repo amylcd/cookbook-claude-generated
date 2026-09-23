@@ -1,13 +1,25 @@
 import Link from "next/link";
 import { getAllTags, getRecipes } from "@/lib/recipes";
+import { BASE_OPTIONS } from "@/lib/constants";
+
+function buildHref(params: { tag?: string; base?: string }) {
+  const query = new URLSearchParams();
+  if (params.tag) query.set("tag", params.tag);
+  if (params.base) query.set("base", params.base);
+  const qs = query.toString();
+  return qs ? `/?${qs}` : "/";
+}
 
 export default async function Home({
   searchParams,
 }: {
-  searchParams: Promise<{ tag?: string }>;
+  searchParams: Promise<{ tag?: string; base?: string }>;
 }) {
-  const { tag } = await searchParams;
-  const [recipes, tags] = await Promise.all([getRecipes(tag), getAllTags()]);
+  const { tag, base } = await searchParams;
+  const [recipes, tags] = await Promise.all([
+    getRecipes(tag, base),
+    getAllTags(),
+  ]);
 
   return (
     <div className="flex flex-1 flex-col bg-zinc-50 dark:bg-black">
@@ -24,10 +36,36 @@ export default async function Home({
           </Link>
         </div>
 
+        <div className="flex flex-wrap gap-2">
+          <Link
+            href={buildHref({ tag })}
+            className={`rounded-full border px-3 py-1 text-sm transition-colors ${
+              !base
+                ? "border-zinc-950 bg-zinc-950 text-white dark:border-zinc-50 dark:bg-zinc-50 dark:text-zinc-950"
+                : "border-zinc-300 text-zinc-600 hover:border-zinc-950 hover:text-zinc-950 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-50 dark:hover:text-zinc-50"
+            }`}
+          >
+            All
+          </Link>
+          {BASE_OPTIONS.map((option) => (
+            <Link
+              key={option}
+              href={buildHref({ tag, base: option })}
+              className={`rounded-full border px-3 py-1 text-sm transition-colors ${
+                base === option
+                  ? "border-zinc-950 bg-zinc-950 text-white dark:border-zinc-50 dark:bg-zinc-50 dark:text-zinc-950"
+                  : "border-zinc-300 text-zinc-600 hover:border-zinc-950 hover:text-zinc-950 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-50 dark:hover:text-zinc-50"
+              }`}
+            >
+              {option}
+            </Link>
+          ))}
+        </div>
+
         {tags.length > 0 && (
           <div className="flex flex-wrap gap-2">
             <Link
-              href="/"
+              href={buildHref({ tag })}
               className={`rounded-full border px-3 py-1 text-sm transition-colors ${
                 !tag
                   ? "border-zinc-950 bg-zinc-950 text-white dark:border-zinc-50 dark:bg-zinc-50 dark:text-zinc-950"
@@ -39,7 +77,7 @@ export default async function Home({
             {tags.map((t) => (
               <Link
                 key={t.id}
-                href={`/?tag=${encodeURIComponent(t.name)}`}
+                href={buildHref({ tag: t.name, base })}
                 className={`rounded-full border px-3 py-1 text-sm transition-colors ${
                   tag === t.name
                     ? "border-zinc-950 bg-zinc-950 text-white dark:border-zinc-50 dark:bg-zinc-50 dark:text-zinc-950"
@@ -55,7 +93,13 @@ export default async function Home({
         {recipes.length === 0 ? (
           <div className="flex flex-1 flex-col items-center justify-center gap-3 py-20 text-center">
             <p className="text-lg font-medium text-zinc-700 dark:text-zinc-300">
-              {tag ? `No recipes tagged "${tag}" yet.` : "No recipes yet."}
+              {tag && base
+                ? `No recipes tagged "${tag}" with a ${base} base yet.`
+                : tag
+                  ? `No recipes tagged "${tag}" yet.`
+                  : base
+                    ? `No recipes with a ${base} base yet.`
+                    : "No recipes yet."}
             </p>
             <Link
               href="/recipes/new"
@@ -91,10 +135,15 @@ export default async function Home({
                     <h2 className="font-medium text-zinc-950 group-hover:underline dark:text-zinc-50">
                       {recipe.title}
                     </h2>
-                    {totalMinutes > 0 && (
+                    {(totalMinutes > 0 || recipe.base) && (
                       <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                        {totalMinutes} min
-                        {recipe.servings ? ` · ${recipe.servings} servings` : ""}
+                        {totalMinutes > 0 ? `${totalMinutes} min` : ""}
+                        {recipe.servings
+                          ? ` · ${recipe.servings} servings`
+                          : ""}
+                        {recipe.base
+                          ? `${totalMinutes > 0 ? " · " : ""}${recipe.base}`
+                          : ""}
                       </p>
                     )}
                     {recipe.tags.length > 0 && (

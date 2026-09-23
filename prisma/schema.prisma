@@ -18,6 +18,7 @@ model Recipe {
   description String?
   ingredients String
   steps       String
+  base        String?
   prepMinutes Int?
   cookMinutes Int?
   servings    Int?

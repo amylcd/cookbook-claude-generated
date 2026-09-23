@@ -1,8 +1,11 @@
+import { BASE_OPTIONS } from "@/lib/constants";
+
 type RecipeFormValues = {
   title: string;
   description: string;
   ingredients: string;
   steps: string;
+  base: string;
   prepMinutes: number | null;
   cookMinutes: number | null;
   servings: number | null;
@@ -107,8 +110,41 @@ export default function RecipeForm({
           rows={6}
           defaultValue={initialValues?.ingredients}
           className={inputClass}
-          placeholder={"One per line, e.g.\n2 cups flour\n1 tsp salt"}
+          placeholder={
+            "One per line, in metric, e.g.\n300g flour\n5g salt\n(cups are fine too, e.g. 2 cups milk)"
+          }
         />
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        <span className={labelClass}>Base</span>
+        <div className="flex flex-wrap gap-2">
+          <label className="cursor-pointer rounded-full border border-zinc-300 px-3 py-1 text-sm text-zinc-600 transition-colors has-checked:border-zinc-950 has-checked:bg-zinc-950 has-checked:text-white dark:border-zinc-700 dark:text-zinc-400 dark:has-checked:border-zinc-50 dark:has-checked:bg-zinc-50 dark:has-checked:text-zinc-950">
+            <input
+              type="radio"
+              name="base"
+              value=""
+              defaultChecked={!initialValues?.base}
+              className="sr-only"
+            />
+            None
+          </label>
+          {BASE_OPTIONS.map((option) => (
+            <label
+              key={option}
+              className="cursor-pointer rounded-full border border-zinc-300 px-3 py-1 text-sm text-zinc-600 transition-colors has-checked:border-zinc-950 has-checked:bg-zinc-950 has-checked:text-white dark:border-zinc-700 dark:text-zinc-400 dark:has-checked:border-zinc-50 dark:has-checked:bg-zinc-50 dark:has-checked:text-zinc-950"
+            >
+              <input
+                type="radio"
+                name="base"
+                value={option}
+                defaultChecked={initialValues?.base === option}
+                className="sr-only"
+              />
+              {option}
+            </label>
+          ))}
+        </div>
       </div>
 
       <div className="flex flex-col gap-1.5">

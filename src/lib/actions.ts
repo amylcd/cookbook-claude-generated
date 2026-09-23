@@ -21,6 +21,7 @@ function readRecipeForm(formData: FormData) {
     description: String(formData.get("description") ?? "").trim(),
     ingredients: String(formData.get("ingredients") ?? "").trim(),
     steps: String(formData.get("steps") ?? "").trim(),
+    base: String(formData.get("base") ?? "").trim(),
     prepMinutes: toIntOrNull(formData.get("prepMinutes")),
     cookMinutes: toIntOrNull(formData.get("cookMinutes")),
     servings: toIntOrNull(formData.get("servings")),

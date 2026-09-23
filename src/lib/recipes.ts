@@ -18,11 +18,12 @@ export async function getAllTags() {
   return prisma.tag.findMany({ orderBy: { name: "asc" } });
 }
 
-export async function getRecipes(tagFilter?: string) {
+export async function getRecipes(tagFilter?: string, baseFilter?: string) {
   return prisma.recipe.findMany({
-    where: tagFilter
-      ? { tags: { some: { tag: { name: tagFilter } } } }
-      : undefined,
+    where: {
+      ...(tagFilter ? { tags: { some: { tag: { name: tagFilter } } } } : {}),
+      ...(baseFilter ? { base: baseFilter } : {}),
+    },
     include: { tags: { include: { tag: true } } },
     orderBy: { createdAt: "desc" },
   });
@@ -40,6 +41,7 @@ interface RecipeInput {
   description: string;
   ingredients: string;
   steps: string;
+  base: string;
   prepMinutes: number | null;
   cookMinutes: number | null;
   servings: number | null;
@@ -68,6 +70,7 @@ export async function createRecipe(input: RecipeInput) {
       description: input.description || null,
       ingredients: input.ingredients,
       steps: input.steps,
+      base: input.base || null,
       prepMinutes: input.prepMinutes,
       cookMinutes: input.cookMinutes,
       servings: input.servings,
@@ -87,6 +90,7 @@ export async function updateRecipe(id: number, input: RecipeInput) {
       description: input.description || null,
       ingredients: input.ingredients,
       steps: input.steps,
+      base: input.base || null,
       prepMinutes: input.prepMinutes,
       cookMinutes: input.cookMinutes,
       servings: input.servings,

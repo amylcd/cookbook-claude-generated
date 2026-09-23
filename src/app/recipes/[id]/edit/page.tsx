@@ -38,6 +38,7 @@ export default async function EditRecipePage({
             description: recipe.description ?? "",
             ingredients: recipe.ingredients,
             steps: recipe.steps,
+            base: recipe.base ?? "",
             prepMinutes: recipe.prepMinutes,
             cookMinutes: recipe.cookMinutes,
             servings: recipe.servings,

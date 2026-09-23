@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getRecipe, linesToList } from "@/lib/recipes";
 import { deleteRecipeAction } from "@/lib/actions";
+import Checklist from "@/components/Checklist";
 
 export default async function RecipeDetailPage({
   params,
@@ -71,6 +72,14 @@ export default async function RecipeDetailPage({
           {recipe.prepMinutes != null && <span>Prep: {recipe.prepMinutes} min</span>}
           {recipe.cookMinutes != null && <span>Cook: {recipe.cookMinutes} min</span>}
           {recipe.servings != null && <span>Servings: {recipe.servings}</span>}
+          {recipe.base && (
+            <Link
+              href={`/?base=${encodeURIComponent(recipe.base)}`}
+              className="underline underline-offset-4 hover:text-zinc-950 dark:hover:text-zinc-50"
+            >
+              Base: {recipe.base}
+            </Link>
+          )}
           {recipe.sourceUrl && (
             <a
               href={recipe.sourceUrl}
@@ -102,29 +111,24 @@ export default async function RecipeDetailPage({
             <h2 className="mb-3 font-medium text-zinc-950 dark:text-zinc-50">
               Ingredients
             </h2>
-            <ul className="flex flex-col gap-2 text-sm text-zinc-700 dark:text-zinc-300">
-              {ingredients.map((item, i) => (
-                <li key={i} className="flex gap-2">
-                  <span className="text-zinc-300 dark:text-zinc-700">•</span>
-                  {item}
-                </li>
-              ))}
-            </ul>
+            <Checklist
+              items={ingredients}
+              storageKey={`recipe-${recipe.id}-ingredients`}
+              className="flex flex-col gap-2 text-sm text-zinc-700 dark:text-zinc-300"
+              marker="bullet"
+            />
           </div>
           <div>
             <h2 className="mb-3 font-medium text-zinc-950 dark:text-zinc-50">
               Steps
             </h2>
-            <ol className="flex flex-col gap-3 text-sm text-zinc-700 dark:text-zinc-300">
-              {steps.map((step, i) => (
-                <li key={i} className="flex gap-3">
-                  <span className="shrink-0 font-medium text-zinc-400 dark:text-zinc-600">
-                    {i + 1}.
-                  </span>
-                  {step}
-                </li>
-              ))}
-            </ol>
+            <Checklist
+              items={steps}
+              storageKey={`recipe-${recipe.id}-steps`}
+              as="ol"
+              className="flex flex-col gap-3 text-sm text-zinc-700 dark:text-zinc-300"
+              marker="number"
+            />
           </div>
         </div>
       </main>
