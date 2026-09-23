@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "cookbook-dev",
+      "runtimeExecutable": "/Users/amydoerr/Documents/cookbook/.claude/dev-server.sh",
+      "runtimeArgs": [],
+      "port": 3000
+    }
+  ]
+}
