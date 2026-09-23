@@ -1,4 +1,8 @@
+"use client";
+
+import { useRef, useState, useTransition } from "react";
 import { BASE_OPTIONS } from "@/lib/constants";
+import { importRecipeFromUrl } from "@/lib/recipeImport";
 
 type RecipeFormValues = {
   title: string;
@@ -28,8 +32,98 @@ export default function RecipeForm({
   initialValues?: Partial<RecipeFormValues>;
   submitLabel: string;
 }) {
+  const formRef = useRef<HTMLFormElement>(null);
+  const [importUrl, setImportUrl] = useState("");
+  const [importError, setImportError] = useState<string | null>(null);
+  const [isImporting, startImport] = useTransition();
+
+  function setFieldValue(name: string, value: string) {
+    const field = formRef.current?.elements.namedItem(name);
+    if (field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement) {
+      field.value = value;
+    }
+  }
+
+  function handleImport() {
+    const url = importUrl.trim();
+    if (!url) return;
+    setImportError(null);
+    startImport(async () => {
+      try {
+        const data = await importRecipeFromUrl(url);
+        setFieldValue("title", data.title);
+        setFieldValue("description", data.description);
+        setFieldValue("ingredients", data.ingredients);
+        setFieldValue("steps", data.steps);
+        setFieldValue("sourceUrl", url);
+        if (data.prepMinutes != null)
+          setFieldValue("prepMinutes", String(data.prepMinutes));
+        if (data.cookMinutes != null)
+          setFieldValue("cookMinutes", String(data.cookMinutes));
+        if (data.servings != null)
+          setFieldValue("servings", String(data.servings));
+        if (data.imageUrl) setFieldValue("imageUrl", data.imageUrl);
+        if (data.tags) setFieldValue("tags", data.tags);
+
+        const haystack = `${data.title} ${data.ingredients}`.toLowerCase();
+        const baseGuess = BASE_OPTIONS.find((option) =>
+          haystack.includes(option.toLowerCase())
+        );
+        if (baseGuess) {
+          const radios = formRef.current?.elements.namedItem("base");
+          if (radios instanceof RadioNodeList) {
+            for (const radio of Array.from(radios)) {
+              if (radio instanceof HTMLInputElement) {
+                radio.checked = radio.value === baseGuess;
+              }
+            }
+          }
+        }
+      } catch (err) {
+        setImportError(
+          err instanceof Error ? err.message : "Couldn't import that recipe."
+        );
+      }
+    });
+  }
+
   return (
-    <form action={action} className="flex flex-col gap-5">
+    <form ref={formRef} action={action} className="flex flex-col gap-5">
+      <div className="flex flex-col gap-1.5 rounded-lg border border-dashed border-zinc-300 p-4 dark:border-zinc-700">
+        <label className={labelClass} htmlFor="importUrl">
+          Import from a link
+        </label>
+        <div className="flex gap-2">
+          <input
+            id="importUrl"
+            type="url"
+            value={importUrl}
+            onChange={(e) => setImportUrl(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                handleImport();
+              }
+            }}
+            className={inputClass}
+            placeholder="https://example.com/some-recipe"
+          />
+          <button
+            type="button"
+            onClick={handleImport}
+            disabled={isImporting || !importUrl.trim()}
+            className="shrink-0 rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:border-zinc-950 hover:text-zinc-950 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-50 dark:hover:text-zinc-50"
+          >
+            {isImporting ? "Importing…" : "Import"}
+          </button>
+        </div>
+        {importError && (
+          <p className="text-sm text-red-600 dark:text-red-400">
+            {importError} You can still fill in the fields below by hand.
+          </p>
+        )}
+      </div>
+
       <div className="flex flex-col gap-1.5">
         <label className={labelClass} htmlFor="title">
           Title

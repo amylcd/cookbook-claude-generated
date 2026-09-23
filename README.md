@@ -1,6 +1,6 @@
 # My Cookbook
 
-A personal recipe dashboard — browse recipes in a filterable grid, filter by tags or by base (rice/potato/bread/pasta), add/edit recipes with a simple form, and check off ingredients and steps while cooking.
+A personal recipe dashboard — browse recipes in a filterable grid, filter by tags or by base (rice/potato/bread/pasta), import a recipe automatically from a link, add/edit recipes with a simple form, and check off ingredients and steps while cooking.
 
 ## Stack
 
@@ -35,6 +35,10 @@ Ingredient quantities are entered as free text and should be in metric units (g/
 
 The recipe detail page renders ingredients and steps as checklists — check items off as you go. Progress is saved to `localStorage` per recipe, so a refresh won't lose your place, and a "Reset checklist" link appears once you've checked something.
 
+## Importing a recipe from a link
+
+The add/edit recipe form has an "Import from a link" box. Paste a URL and it fetches the page and reads the `Recipe` structured data (JSON-LD/schema.org) that most recipe sites already publish for Google's rich results, then auto-fills title, description, ingredients, steps, prep/cook time, servings, image, tags, and a best-guess base. Pages without that structured data (or that block scraping) will show an error and fall back to manual entry.
+
 ## Project structure
 
 - `src/app/page.tsx` — dashboard (grid + tag/base filters)
@@ -42,5 +46,7 @@ The recipe detail page renders ingredients and steps as checklists — check ite
 - `src/app/recipes/new` and `src/app/recipes/[id]/edit` — add/edit forms
 - `src/lib/recipes.ts` — data access layer
 - `src/lib/actions.ts` — server actions for create/update/delete
+- `src/lib/recipeImport.ts` — server action that fetches a URL and parses its `Recipe` JSON-LD
 - `src/lib/constants.ts` — shared option lists (e.g. `BASE_OPTIONS`)
 - `src/components/Checklist.tsx` — client-side checkbox list with `localStorage` persistence
+- `src/components/RecipeForm.tsx` — add/edit form, including the URL import UI

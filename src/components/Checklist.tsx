@@ -25,12 +25,14 @@ export default function Checklist({
       if (!stored) return;
       const parsed = JSON.parse(stored);
       if (Array.isArray(parsed) && parsed.length === items.length) {
+        // Reading persisted state from localStorage after mount avoids an
+        // SSR hydration mismatch (localStorage isn't available on the server).
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setChecked(parsed);
       }
     } catch {
       // ignore malformed storage
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [storageKey, items.length]);
 
   function toggle(index: number) {
