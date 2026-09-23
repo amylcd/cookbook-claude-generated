@@ -1,6 +1,6 @@
 # My Cookbook
 
-A personal recipe dashboard — browse recipes in a filterable grid, filter by tags or by base (rice/potato/bread/pasta), import a recipe automatically from a link, add/edit recipes with a simple form, and check off ingredients and steps while cooking.
+A personal recipe dashboard — browse recipes in a filterable grid, filter by tags or by base (rice/potato/bread/pasta/sweet/sauce/soup), import a recipe automatically from a link, add/edit recipes with a simple form, and check off ingredients and steps while cooking.
 
 ## Stack
 
@@ -27,7 +27,9 @@ Open [http://localhost:3000](http://localhost:3000) to view the dashboard.
 
 ## Data model
 
-Recipes live in `prisma/schema.prisma` (SQLite, `prisma/dev.db`). Each recipe has a title, description, ingredients, steps, an optional base (Rice/Potato/Bread/Pasta, used for filtering), prep/cook time, servings, an optional source URL and image URL, and any number of tags used for filtering on the dashboard.
+Recipes live in `prisma/schema.prisma` (SQLite, `prisma/dev.db`). Each recipe has a title, description, ingredients, steps, an optional base (Rice/Potato/Bread/Pasta/Sweet/Sauce/Soup, used for filtering — see `BASE_OPTIONS` in `src/lib/constants.ts`), prep/cook time, servings, an optional source URL and image URL, and any number of tags used for filtering on the dashboard.
+
+Tags are freeform and can accumulate unused entries over time (e.g. after editing a recipe's tags); the dashboard has a "Reset unused tags" button that deletes any tag not attached to a recipe.
 
 Ingredient quantities are entered as free text and should be in metric units (g/ml/°C) — cups are fine as an exception, but avoid other imperial units (tbsp, tsp, °F, oz, lb).
 

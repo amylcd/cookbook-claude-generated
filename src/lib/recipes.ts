@@ -107,3 +107,10 @@ export async function updateRecipe(id: number, input: RecipeInput) {
 export async function deleteRecipe(id: number) {
   return prisma.recipe.delete({ where: { id } });
 }
+
+export async function deleteUnusedTags() {
+  const result = await prisma.tag.deleteMany({
+    where: { recipes: { none: {} } },
+  });
+  return result.count;
+}

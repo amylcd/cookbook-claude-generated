@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import {
   createRecipe,
   deleteRecipe,
+  deleteUnusedTags,
   tagsToList,
   updateRecipe,
 } from "@/lib/recipes";
@@ -56,4 +57,9 @@ export async function deleteRecipeAction(id: number) {
   await deleteRecipe(id);
   revalidatePath("/");
   redirect("/");
+}
+
+export async function resetUnusedTagsAction() {
+  await deleteUnusedTags();
+  revalidatePath("/");
 }

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getAllTags, getRecipes } from "@/lib/recipes";
+import { resetUnusedTagsAction } from "@/lib/actions";
 import { BASE_OPTIONS } from "@/lib/constants";
 
 function buildHref(params: { tag?: string; base?: string }) {
@@ -63,9 +64,9 @@ export default async function Home({
         </div>
 
         {tags.length > 0 && (
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <Link
-              href={buildHref({ tag })}
+              href={buildHref({ base })}
               className={`rounded-full border px-3 py-1 text-sm transition-colors ${
                 !tag
                   ? "border-zinc-950 bg-zinc-950 text-white dark:border-zinc-50 dark:bg-zinc-50 dark:text-zinc-950"
@@ -87,6 +88,15 @@ export default async function Home({
                 {t.name}
               </Link>
             ))}
+            <form action={resetUnusedTagsAction} className="ml-1">
+              <button
+                type="submit"
+                className="rounded-full border border-dashed border-zinc-300 px-3 py-1 text-sm text-zinc-500 transition-colors hover:border-zinc-950 hover:text-zinc-950 dark:border-zinc-700 dark:text-zinc-500 dark:hover:border-zinc-50 dark:hover:text-zinc-50"
+                title="Remove tags that aren't used by any recipe"
+              >
+                Reset unused tags
+              </button>
+            </form>
           </div>
         )}
 
