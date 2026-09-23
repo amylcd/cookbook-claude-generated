@@ -1,4 +1,4 @@
-# My Cookbook
+# My Cookbook (generated with ClaudeAI)
 
 A personal recipe dashboard — browse recipes in a filterable grid, filter by tags or by base (rice/potato/bread/pasta/sweet/sauce/soup), import a recipe automatically from a link, add/edit recipes with a simple form, and check off ingredients and steps while cooking.
 
